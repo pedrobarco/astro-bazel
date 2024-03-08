@@ -1,0 +1,28 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+load("@npm//website:astro/package_json.bzl", "bin")
+
+npm_link_all_packages()
+
+SRCS = [
+    "package.json",
+    "astro.config.mjs",
+    "//website/src",
+    "//website/public",
+]
+
+BUILD_DEPS = [
+    ":node_modules/astro",
+]
+
+bin.astro_binary(
+    name = "astro",
+    chdir = package_name(),
+)
+
+js_run_devserver(
+    name = "start",
+    args = ["dev"],
+    data = SRCS + BUILD_DEPS,
+    tool = ":astro",
+)
